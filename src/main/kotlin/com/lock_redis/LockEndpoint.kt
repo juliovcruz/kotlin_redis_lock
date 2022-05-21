@@ -18,8 +18,7 @@ import java.util.concurrent.TimeUnit
 class LockEndpoint(
     private val redisson: RedissonClient? = Redisson.create(Config().also {
         it.useSingleServer()
-            .setPassword("redis").address = "redis://127.0.0.1:6379"
-
+            .setPassword("redis").address = "redis://localhost:6379"
     })
 ) {
 
