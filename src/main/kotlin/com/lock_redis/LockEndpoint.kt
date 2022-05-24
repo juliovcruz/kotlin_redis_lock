@@ -26,13 +26,16 @@ class LockEndpoint(
     @ResponseStatus(HttpStatus.NO_CONTENT)
     fun lock(@RequestParam sleep: Long, @PathVariable key: String) {
         val lock = this.redisson!!.getLock(key)
+        try {
+            if(!lock.tryLock(1, TimeUnit.SECONDS)) {
+                throw ResponseStatusException(HttpStatus.PRECONDITION_FAILED)
+            }
 
-        if(!lock.tryLock(1, TimeUnit.SECONDS)) {
-            throw ResponseStatusException(HttpStatus.PRECONDITION_FAILED)
+            Thread.sleep(sleep * 1000)
+        } catch (e: Throwable) {
+            throw e
+        } finally {
+            lock.unlockAsync()
         }
-
-        Thread.sleep(sleep * 1000)
-
-        lock.unlockAsync()
     }
 }
